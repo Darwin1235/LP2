@@ -1,0 +1,33 @@
+<?php
+require_once __DIR__ . '/../models/Usuario.php';
+
+class AuthController {
+    public function login() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $correo = trim($_POST['correo'] ?? '');
+            $contrasena = trim($_POST['contrasena'] ?? '');
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                $error = "Formato de correo inválido.";
+                require __DIR__ . '/../views/auth/login.php';
+                return;
+            }
+            $modelo = new Usuario();
+            $usuario = $modelo->autenticar($correo, $contrasena);
+            if ($usuario) {
+                session_start();
+                $_SESSION['usuario'] = $usuario;
+                header("Location: index.php?action=dashboard");
+                exit();
+            } else {
+                $error = "Usuario o contraseña incorrectos.";
+            }
+        }
+        require __DIR__ . '/../views/auth/login.php';
+    }
+    public function logout() {
+        session_start();
+        session_destroy();
+        header("Location: index.php?action=login");
+        exit();
+    }
+}
