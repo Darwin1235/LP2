@@ -1,0 +1,10 @@
+# Ignorar credenciales reales y archivos de entorno
+config/config_local.php
+.env
+
+# Ignorar dependencias y archivos del sistema
+vendor/
+node_modules/
+.DS_Store
+Thumbs.db
+.vscode/
