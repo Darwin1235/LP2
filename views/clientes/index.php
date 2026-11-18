@@ -1,3 +1,9 @@
+<?php if (!empty($alerta)): ?>
+    <div class="alert alert-<?= $alerta['tipo'] ?> alert-dismissible fade show">
+        <?= htmlspecialchars($alerta['texto']) ?>
+    </div>
+<?php endif; ?>
+
 <div class="row">
     <div class="col-md-4">
         <div class="card shadow-sm">
@@ -9,7 +15,7 @@
                     <input type="hidden" name="id_cliente" value="<?= $clienteEditar['id_cliente'] ?? '' ?>">
                     <div class="mb-2">
                         <label>DNI / RUC</label>
-                        <input type="text" name="documento" class="form-control" required value="<?= htmlspecialchars($clienteEditar['documento'] ?? '') ?>">
+                        <input type="text" name="documento" class="form-control" pattern="[0-9]{8,11}" maxlength="11" placeholder="8 u 11 dígitos" required value="<?= htmlspecialchars($clienteEditar['documento'] ?? '') ?>">
                     </div>
                     <div class="mb-2">
                         <label>Nombre / Razón Social</label>
@@ -55,6 +61,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (empty($clientes)): ?>
+                            <tr><td colspan="5" class="text-center text-muted">Aún no hay clientes registrados.</td></tr>
+                        <?php endif; ?>
                         <?php foreach ($clientes as $cli): ?>
                         <tr>
                             <td><strong><?= htmlspecialchars($cli['documento']) ?></strong></td>

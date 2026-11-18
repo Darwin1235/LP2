@@ -1,4 +1,4 @@
-bd_alquiler_maquinariaCREATE DATABASE IF NOT EXISTS bd_alquiler_maquinaria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS bd_alquiler_maquinaria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bd_alquiler_maquinaria;
 
 CREATE TABLE usuario (
@@ -85,23 +85,6 @@ CREATE TABLE notificacion (
     FOREIGN KEY (id_contrato) REFERENCES contrato_alquiler(id_contrato)
 );
 
--- ==========================================
--- DATOS DE PRUEBA (Requeridos por la rúbrica)
--- ==========================================
 INSERT INTO usuario (nombre, apellido, correo, contrasena, rol, estado) VALUES
 ('Darwin', 'Admin', 'admin@empresam.com', '123456', 'Administrador', 1),
 ('Carlos', 'Encargado', 'encargado@empresam.com', '123456', 'Encargado', 1);
-
-INSERT INTO categoria_equipo (nombre, descripcion) VALUES
-('Excavación', 'Maquinaria pesada para movimiento de tierras'),
-('Compactación', 'Equipos para compactar suelos y asfalto'),
-('Mezclado', 'Equipos para preparación de concreto');
-
-INSERT INTO equipo (id_categoria, codigo, nombre, descripcion, marca, modelo, precio_alquiler, estado_operativo) VALUES
-(1, 'EQ-001', 'Miniexcavadora Hidráulica', 'Brazo de 2.5m, cabina cerrada', 'Caterpillar', '303.5E2', 450.00, 'Disponible'),
-(2, 'EQ-002', 'Rodillo Compactador', 'Rodillo vibratorio doble tambor', 'Bomag', 'BW120AD', 320.00, 'Disponible'),
-(3, 'EQ-003', 'Mezcladora de Concreto', 'Capacidad 11 pies cúbicos motor Honda', 'Whiteman', 'WM90', 95.00, 'Disponible');
-
-INSERT INTO cliente (documento, nombre, apellido, telefono, correo, direccion) VALUES
-('20601234561', 'Constructora Andes SAC', 'Representante Legal', '962111222', 'contacto@andes.com', 'Jr. Huallayco 450, Huánuco'),
-('45896321', 'Juan', 'Pérez Gómez', '962333444', 'jperez@gmail.com', 'Av. Universitaria 120, Pillco Marca');

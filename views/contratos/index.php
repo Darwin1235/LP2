@@ -1,5 +1,5 @@
-<?php if ($alerta): ?>
-    <div class="alert alert-<?= $alerta['ok'] ? 'success' : 'danger' ?>">
+<?php if (!empty($alerta)): ?>
+    <div class="alert alert-<?= $alerta['ok'] ? 'success' : 'danger' ?> alert-dismissible fade show">
         <?= htmlspecialchars($alerta['mensaje']) ?>
     </div>
 <?php endif; ?>
@@ -27,7 +27,7 @@
                             <option value="">-- Seleccione Equipo --</option>
                             <?php foreach ($equiposDisponibles as $eq): ?>
                                 <option value="<?= $eq['id_equipo'] ?>">
-                                    <?= htmlspecialchars($eq['codigo'] . ' - ' . $eq['nombre'] . ' (S/ ' . $eq['precio_alquiler'] . '/día)') ?>
+                                    <?= htmlspecialchars($eq['codigo'] . ' - ' . $eq['nombre'] . ' (S/ ' . number_format($eq['precio_alquiler'], 2) . '/día)') ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -62,6 +62,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (empty($contratos)): ?>
+                            <tr><td colspan="6" class="text-center text-muted">Aún no hay contratos de alquiler registrados.</td></tr>
+                        <?php endif; ?>
                         <?php foreach ($contratos as $ctr): ?>
                         <tr>
                             <td><strong><?= htmlspecialchars($ctr['numero_contrato']) ?></strong></td>

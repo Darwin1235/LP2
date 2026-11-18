@@ -29,7 +29,11 @@
                     <td><strong><?= htmlspecialchars($n['numero_contrato']) ?></strong></td>
                     <td><?= htmlspecialchars($n['mensaje']) ?></td>
                     <td><?= htmlspecialchars($n['telefono']) ?></td>
-                    <td><?= $n['estado'] ?></td>
+                    <td>
+                        <span class="badge bg-<?= $n['estado'] === 'Pendiente' ? 'secondary' : 'success' ?>">
+                            <?= htmlspecialchars($n['estado']) ?>
+                        </span>
+                    </td>
                     <td>
                         <?php if ($n['estado'] === 'Pendiente'): ?>
                             <a href="index.php?action=alertas&leida=<?= $n['id_notificacion'] ?>" class="btn btn-sm btn-outline-success">Marcar Atendida</a>

@@ -1,3 +1,9 @@
+<?php if (!empty($alerta)): ?>
+    <div class="alert alert-<?= $alerta['tipo'] ?> alert-dismissible fade show">
+        <?= htmlspecialchars($alerta['texto']) ?>
+    </div>
+<?php endif; ?>
+
 <div class="row">
     <!-- Formulario de Equipos -->
     <div class="col-md-4">
@@ -12,6 +18,7 @@
                     <div class="mb-2">
                         <label>Categoría</label>
                         <select name="id_categoria" class="form-select" required>
+                            <option value="">-- Seleccione Categoría --</option>
                             <?php foreach ($categorias as $cat): ?>
                                 <option value="<?= $cat['id_categoria'] ?>" <?= ($equipoEditar['id_categoria'] ?? '') == $cat['id_categoria'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cat['nombre']) ?>
@@ -21,7 +28,7 @@
                     </div>
                     <div class="mb-2">
                         <label>Código</label>
-                        <input type="text" name="codigo" class="form-control" required placeholder="EQ-004" value="<?= htmlspecialchars($equipoEditar['codigo'] ?? '') ?>">
+                        <input type="text" name="codigo" class="form-control" required placeholder="EQ-001" value="<?= htmlspecialchars($equipoEditar['codigo'] ?? '') ?>">
                     </div>
                     <div class="mb-2">
                         <label>Nombre</label>
@@ -39,7 +46,7 @@
                     </div>
                     <div class="mb-2">
                         <label>Precio por Día (S/)</label>
-                        <input type="number" step="0.01" name="precio_alquiler" class="form-control" required value="<?= $equipoEditar['precio_alquiler'] ?? '' ?>">
+                        <input type="number" step="0.01" min="0.01" name="precio_alquiler" class="form-control" required value="<?= $equipoEditar['precio_alquiler'] ?? '' ?>">
                     </div>
                     <div class="mb-2">
                         <label>Estado Operativo</label>
@@ -76,6 +83,9 @@
                     <button type="submit" class="btn btn-dark btn-sm w-100">Agregar Categoría</button>
                 </form>
                 <ul class="list-group list-group-flush small">
+                    <?php if (empty($categorias)): ?>
+                        <li class="list-group-item text-muted px-0">Cree una categoría antes de registrar equipos.</li>
+                    <?php endif; ?>
                     <?php foreach ($categorias as $c): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><strong><?= htmlspecialchars($c['nombre']) ?></strong></span>
@@ -104,6 +114,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (empty($equipos)): ?>
+                            <tr><td colspan="6" class="text-center text-muted">Aún no hay equipos registrados en el inventario.</td></tr>
+                        <?php endif; ?>
                         <?php foreach ($equipos as $eq): ?>
                         <tr>
                             <td><strong><?= htmlspecialchars($eq['codigo']) ?></strong></td>

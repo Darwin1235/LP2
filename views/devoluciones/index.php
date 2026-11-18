@@ -1,5 +1,7 @@
-<?php if ($mensaje): ?>
-    <div class="alert alert-info"><?= htmlspecialchars($mensaje) ?></div>
+<?php if (!empty($alerta)): ?>
+    <div class="alert alert-<?= $alerta['tipo'] ?> alert-dismissible fade show">
+        <?= htmlspecialchars($alerta['texto']) ?>
+    </div>
 <?php endif; ?>
 
 <div class="card shadow-sm mb-4">
@@ -35,7 +37,7 @@
                                 <option value="Requiere Mantenimiento">Con Daños (Mantenimiento)</option>
                             </select>
                             <input type="text" name="observacion" class="form-control form-control-sm" placeholder="Observación">
-                            <button type="submit" class="btn btn-sm btn-success">Recibir</button>
+                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('¿Confirmar recepción del equipo?')">Recibir</button>
                         </form>
                     </td>
                 </tr>
@@ -60,6 +62,9 @@
                 </tr>
             </thead>
             <tbody>
+                <?php if (empty($historial)): ?>
+                    <tr><td colspan="6" class="text-center text-muted">Aún no se han registrado devoluciones.</td></tr>
+                <?php endif; ?>
                 <?php foreach ($historial as $h): ?>
                 <tr>
                     <td><?= htmlspecialchars($h['numero_contrato']) ?></td>
