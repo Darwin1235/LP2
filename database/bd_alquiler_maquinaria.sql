@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS bd_alquiler_maquinaria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+bd_alquiler_maquinariaCREATE DATABASE IF NOT EXISTS bd_alquiler_maquinaria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bd_alquiler_maquinaria;
 
 CREATE TABLE usuario (
