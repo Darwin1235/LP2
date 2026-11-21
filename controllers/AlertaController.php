@@ -3,10 +3,6 @@ require_once __DIR__ . '/../models/Notificacion.php';
 
 class AlertaController {
     public function index() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         $notificacionModel = new Notificacion();
         $notificacionModel->sincronizarAlertasVencimiento();
 
@@ -20,7 +16,8 @@ class AlertaController {
         $mensaje = $_SESSION['alerta_notificacion'] ?? null;
         unset($_SESSION['alerta_notificacion']);
 
-        $notificaciones = $notificacionModel->listar();
+        $notificaciones = $notificacionModel->listar($filtro);
+        $resumen = $notificacionModel->obtenerResumen();
 
         require __DIR__ . '/../views/layout/header.php';
         if ($mensaje) {
