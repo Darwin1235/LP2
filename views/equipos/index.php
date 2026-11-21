@@ -1,5 +1,11 @@
+<?php
+$totalEquipos      = count($equipos);
+$totalDisponibles  = count(array_filter($equipos, fn($e) => $e['estado_operativo'] === 'Disponible'));
+$totalOcupados     = count(array_filter($equipos, fn($e) => $e['estado_operativo'] === 'Ocupado'));
+$totalMantenimiento = count(array_filter($equipos, fn($e) => $e['estado_operativo'] === 'Mantenimiento'));
+?>
+
 <div class="row">
-    <!-- Formulario de Equipos -->
     <div class="col-md-4">
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-dark text-white">
@@ -62,7 +68,6 @@
             </div>
         </div>
 
-        <!-- Gestión Rápida de Categorías -->
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">Categorías de Equipo</div>
             <div class="card-body">
@@ -95,12 +100,46 @@
         </div>
     </div>
 
-    <!-- Tabla de Equipos -->
     <div class="col-md-8">
         <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">Inventario de Maquinaria</div>
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span>Inventario de Maquinaria</span>
+                <span class="badge bg-light text-dark" id="contadorMostrados">
+                    Mostrando <?= $totalEquipos ?> de <?= $totalEquipos ?>
+                </span>
+            </div>
+
+            <div class="card-body border-bottom bg-light py-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-5">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted">🔍</span>
+                            <input type="text" id="buscadorEquipos" class="form-control border-start-0"
+                                   placeholder="Buscar por código, nombre, marca o categoría...">
+                            <button type="button" id="limpiarBusqueda" class="btn btn-outline-secondary d-none" title="Limpiar filtro">✕</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="d-flex flex-wrap gap-1 justify-content-lg-end" id="filtrosEstado">
+                            <button type="button" class="btn btn-sm btn-dark filtro-estado active" data-estado="Todos">
+                                Todos <span class="badge bg-secondary ms-1"><?= $totalEquipos ?></span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success filtro-estado" data-estado="Disponible">
+                                Disponible <span class="badge bg-success ms-1"><?= $totalDisponibles ?></span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning text-dark filtro-estado" data-estado="Ocupado">
+                                Ocupado <span class="badge bg-warning text-dark ms-1"><?= $totalOcupados ?></span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger filtro-estado" data-estado="Mantenimiento">
+                                Mantenimiento <span class="badge bg-danger ms-1"><?= $totalMantenimiento ?></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-body table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle" id="tablaEquipos">
                     <thead class="table-light">
                         <tr>
                             <th>Código</th>
@@ -116,7 +155,9 @@
                             <tr><td colspan="6" class="text-center text-muted">Aún no hay equipos registrados en el inventario.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($equipos as $eq): ?>
-                        <tr>
+                        <tr class="fila-equipo"
+                            data-estado="<?= htmlspecialchars($eq['estado_operativo']) ?>"
+                            data-busqueda="<?= htmlspecialchars(strtolower($eq['codigo'] . ' ' . $eq['nombre'] . ' ' . $eq['marca'] . ' ' . $eq['modelo'] . ' ' . $eq['categoria'])) ?>">
                             <td><strong><?= htmlspecialchars($eq['codigo']) ?></strong></td>
                             <td><?= htmlspecialchars($eq['nombre']) ?><br><small class="text-muted"><?= htmlspecialchars($eq['marca'] . ' ' . $eq['modelo']) ?></small></td>
                             <td><?= htmlspecialchars($eq['categoria']) ?></td>
@@ -136,6 +177,11 @@
                             </td>
                         </tr>
                         <?php endforeach; ?>
+                        <tr id="filaSinResultados" class="d-none">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No se encontraron equipos que coincidan con el filtro aplicado.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -143,7 +189,6 @@
     </div>
 </div>
 
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 <?php if (!empty($alerta)): ?>
@@ -177,4 +222,67 @@ document.querySelectorAll('.btn-confirmar-eliminar').forEach(btn => {
         });
     });
 });
+
+(function() {
+    const inputBuscar = document.getElementById('buscadorEquipos');
+    const btnLimpiar = document.getElementById('limpiarBusqueda');
+    const botonesEstado = document.querySelectorAll('.filtro-estado');
+    const filas = document.querySelectorAll('.fila-equipo');
+    const filaVacia = document.getElementById('filaSinResultados');
+    const contador = document.getElementById('contadorMostrados');
+    const total = filas.length;
+    let estadoActivo = 'Todos';
+
+    function aplicarFiltros() {
+        const texto = inputBuscar.value.trim().toLowerCase();
+        btnLimpiar.classList.toggle('d-none', texto === '');
+        let visibles = 0;
+
+        filas.forEach(fila => {
+            const coincideEstado = (estadoActivo === 'Todos' || fila.dataset.estado === estadoActivo);
+            const coincideTexto = (texto === '' || fila.dataset.busqueda.includes(texto));
+
+            if (coincideEstado && coincideTexto) {
+                fila.classList.remove('d-none');
+                visibles++;
+            } else {
+                fila.classList.add('d-none');
+            }
+        });
+
+        if (filaVacia && total > 0) {
+            filaVacia.classList.toggle('d-none', visibles > 0);
+        }
+        if (contador) {
+            contador.textContent = `Mostrando ${visibles} de ${total}`;
+        }
+    }
+
+    inputBuscar.addEventListener('input', aplicarFiltros);
+
+    btnLimpiar.addEventListener('click', () => {
+        inputBuscar.value = '';
+        aplicarFiltros();
+        inputBuscar.focus();
+    });
+
+    botonesEstado.forEach(btn => {
+        btn.addEventListener('click', () => {
+            botonesEstado.forEach(b => b.classList.remove('active', 'btn-dark', 'text-white'));
+            botonesEstado.forEach(b => {
+                const est = b.dataset.estado;
+                if (est === 'Todos') b.classList.add('btn-outline-dark');
+            });
+
+            btn.classList.remove('btn-outline-dark');
+            btn.classList.add('active');
+            if (btn.dataset.estado === 'Todos') {
+                btn.classList.add('btn-dark', 'text-white');
+            }
+
+            estadoActivo = btn.dataset.estado;
+            aplicarFiltros();
+        });
+    });
+})();
 </script>
