@@ -27,6 +27,17 @@ class Equipo {
         return $stmt->fetch();
     }
 
+    public function existeCodigo($codigo, $idExcluir = null) {
+        if ($idExcluir) {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM equipo WHERE codigo = ? AND id_equipo != ?");
+            $stmt->execute([$codigo, $idExcluir]);
+        } else {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM equipo WHERE codigo = ?");
+            $stmt->execute([$codigo]);
+        }
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
     public function guardar($datos) {
         $sql = "INSERT INTO equipo (id_categoria, codigo, nombre, descripcion, marca, modelo, precio_alquiler, estado_operativo) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
