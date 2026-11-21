@@ -1,45 +1,52 @@
+
 <?php
 require_once __DIR__ . '/../models/ContratoAlquiler.php';
 require_once __DIR__ . '/../models/Cliente.php';
 require_once __DIR__ . '/../models/Equipo.php';
 
-class ContratoController {
-    public function index() {
+class ContratoController
+{
+    public function index(): void
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+        }
+
+        // Registrar contratos requiere una cuenta que haya iniciado sesion.
+        if (empty($_SESSION['usuario']['id_usuario'])) {
+            header('Location: index.php?action=login');
+            exit;
+        }
+
+        if (empty($_SESSION['csrf_contratos'])) {
+            $_SESSION['csrf_contratos'] = bin2hex(random_bytes(32));
         }
 
         $contratoModel = new ContratoAlquiler();
         $clienteModel = new Cliente();
         $equipoModel = new Equipo();
+        $alerta = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $idCliente = $_POST['id_cliente'] ?? '';
-            $idEquipo = $_POST['id_equipo'] ?? '';
-            $fechaInicio = $_POST['fecha_inicio'] ?? '';
-            $fechaFin = $_POST['fecha_fin_prevista'] ?? '';
+            $token = $_POST['csrf_token'] ?? '';
 
-            if ($idCliente === '' || $idEquipo === '' || $fechaInicio === '' || $fechaFin === '') {
-                $_SESSION['alerta_contrato'] = ['ok' => false, 'mensaje' => 'Todos los campos del contrato son obligatorios.'];
-            } elseif ($fechaFin < $fechaInicio) {
-                $_SESSION['alerta_contrato'] = ['ok' => false, 'mensaje' => 'La fecha de fin prevista no puede ser anterior a la fecha de inicio.'];
+            if (!is_string($token) || !hash_equals($_SESSION['csrf_contratos'], $token)) {
+                $alerta = [
+                    'ok' => false,
+                    'mensaje' => 'Formulario no valido. Actualiza la pagina e intenta otra vez.'
+                ];
             } else {
                 $datos = [
-                    'id_usuario' => $_SESSION['usuario']['id_usuario'] ?? 1,
-                    'id_cliente' => $idCliente,
-                    'id_equipo' => $idEquipo,
-                    'fecha_inicio' => $fechaInicio,
-                    'fecha_fin_prevista' => $fechaFin
+                    'id_usuario' => $_SESSION['usuario']['id_usuario'],
+                    'id_cliente' => $_POST['id_cliente'] ?? null,
+                    'id_equipos' => $_POST['id_equipos'] ?? [],
+                    'fecha_inicio' => $_POST['fecha_inicio'] ?? '',
+                    'fecha_fin_prevista' => $_POST['fecha_fin_prevista'] ?? ''
                 ];
-                $_SESSION['alerta_contrato'] = $contratoModel->registrar($datos);
+
+                $alerta = $contratoModel->registrar($datos);
             }
-
-            header("Location: index.php?action=contratos");
-            exit();
         }
-
-        $alerta = $_SESSION['alerta_contrato'] ?? null;
-        unset($_SESSION['alerta_contrato']);
 
         $contratos = $contratoModel->listar();
         $clientes = $clienteModel->listar();
