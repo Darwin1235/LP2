@@ -8,13 +8,21 @@ class AlertaController {
 
         if (isset($_GET['leida'])) {
             $notificacionModel->marcarLeida($_GET['leida']);
+            $_SESSION['alerta_notificacion'] = "Notificación marcada como atendida.";
             header("Location: index.php?action=alertas");
             exit();
         }
 
-        $notificaciones = $notificacionModel->listar();
+        $mensaje = $_SESSION['alerta_notificacion'] ?? null;
+        unset($_SESSION['alerta_notificacion']);
+
+        $notificaciones = $notificacionModel->listar($filtro);
+        $resumen = $notificacionModel->obtenerResumen();
 
         require __DIR__ . '/../views/layout/header.php';
+        if ($mensaje) {
+            echo '<div class="alert alert-success">' . htmlspecialchars($mensaje) . '</div>';
+        }
         require __DIR__ . '/../views/alertas/index.php';
         require __DIR__ . '/../views/layout/footer.php';
     }
