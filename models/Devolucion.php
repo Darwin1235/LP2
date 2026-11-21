@@ -37,17 +37,14 @@ class Devolucion {
         try {
             $this->pdo->beginTransaction();
 
-            // 1. Registrar la devolución
             $sqlDev = "INSERT INTO devolucion (id_detalle, fecha_devolucion, observacion, condicion_equipo) 
                        VALUES (?, CURDATE(), ?, ?)";
             $stmt = $this->pdo->prepare($sqlDev);
             $stmt->execute([$idDetalle, $observacion, $condicion]);
 
-            // 2. Actualizar el contrato a 'Devuelto'
             $this->pdo->prepare("UPDATE contrato_alquiler SET estado = 'Devuelto' WHERE id_contrato = ?")
                       ->execute([$idContrato]);
 
-            // 3. Actualizar el estado del equipo según su condición física
             $nuevoEstadoEquipo = ($condicion === 'Requiere Mantenimiento') ? 'Mantenimiento' : 'Disponible';
             $this->pdo->prepare("UPDATE equipo SET estado_operativo = ? WHERE id_equipo = ?")
                       ->execute([$nuevoEstadoEquipo, $idEquipo]);

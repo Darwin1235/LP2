@@ -1,9 +1,3 @@
-<?php if (!empty($alerta)): ?>
-    <div class="alert alert-<?= $alerta['tipo'] ?> alert-dismissible fade show">
-        <?= htmlspecialchars($alerta['texto']) ?>
-    </div>
-<?php endif; ?>
-
 <div class="row">
     <!-- Formulario de Equipos -->
     <div class="col-md-4">
@@ -89,7 +83,11 @@
                     <?php foreach ($categorias as $c): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><strong><?= htmlspecialchars($c['nombre']) ?></strong></span>
-                            <a href="index.php?action=equipos&eliminar_cat=<?= $c['id_categoria'] ?>" class="text-danger text-decoration-none" onclick="return confirm('¿Eliminar categoría?')">✕</a>
+                            <?php if (($_SESSION['usuario']['rol'] ?? '') === 'Administrador'): ?>
+                                <a href="index.php?action=equipos&eliminar_cat=<?= $c['id_categoria'] ?>"
+                                   class="text-danger text-decoration-none fw-bold btn-confirmar-eliminar"
+                                   data-mensaje="¿Deseas eliminar la categoría «<?= htmlspecialchars($c['nombre']) ?>»?">✕</a>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -130,7 +128,11 @@
                             </td>
                             <td>
                                 <a href="index.php?action=equipos&editar=<?= $eq['id_equipo'] ?>" class="btn btn-sm btn-outline-primary">Editar</a>
-                                <a href="index.php?action=equipos&eliminar=<?= $eq['id_equipo'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este equipo?')">Eliminar</a>
+                                <?php if (($_SESSION['usuario']['rol'] ?? '') === 'Administrador'): ?>
+                                    <a href="index.php?action=equipos&eliminar=<?= $eq['id_equipo'] ?>"
+                                       class="btn btn-sm btn-outline-danger btn-confirmar-eliminar"
+                                       data-mensaje="Se eliminará el equipo «<?= htmlspecialchars($eq['codigo'] . ' - ' . $eq['nombre']) ?>» del inventario.">Eliminar</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -140,3 +142,39 @@
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+<?php if (!empty($alerta)): ?>
+Swal.fire({
+    icon: <?= json_encode($alerta['tipo']) ?>,
+    title: <?= json_encode($alerta['titulo'] ?? 'Aviso') ?>,
+    text: <?= json_encode($alerta['texto']) ?>,
+    confirmButtonColor: '#0f172a'
+});
+<?php endif; ?>
+
+document.querySelectorAll('.btn-confirmar-eliminar').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = this.getAttribute('href');
+        const mensaje = this.getAttribute('data-mensaje') || 'Esta acción no se puede deshacer.';
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: mensaje,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>

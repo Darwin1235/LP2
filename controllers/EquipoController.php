@@ -10,6 +10,7 @@ class EquipoController {
 
         $equipoModel = new Equipo();
         $categoriaModel = new CategoriaEquipo();
+        $rolUsuario = $_SESSION['usuario']['rol'] ?? 'Encargado';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subaccion = $_POST['subaccion'] ?? '';
@@ -19,12 +20,15 @@ class EquipoController {
                     if ($nombreCat === '') {
                         throw new Exception("El nombre de la categoría es obligatorio.");
                     }
+                    if ($categoriaModel->existeNombre($nombreCat)) {
+                        throw new Exception("La categoría «{$nombreCat}» ya existe en el sistema.");
+                    }
                     $categoriaModel->guardar($nombreCat, trim($_POST['desc_cat'] ?? ''));
-                    $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'texto' => 'Categoría registrada correctamente.'];
+                    $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => '¡Registrado!', 'texto' => 'Categoría agregada correctamente.'];
                 } elseif ($subaccion === 'guardar_equipo') {
                     $id = $_POST['id_equipo'] ?? '';
                     $idCategoria = $_POST['id_categoria'] ?? '';
-                    $codigo = trim($_POST['codigo'] ?? '');
+                    $codigo = strtoupper(trim($_POST['codigo'] ?? ''));
                     $nombre = trim($_POST['nombre'] ?? '');
                     $precio = floatval($_POST['precio_alquiler'] ?? 0);
 
@@ -37,22 +41,28 @@ class EquipoController {
                     if ($precio <= 0) {
                         throw new Exception("La tarifa diaria debe ser mayor a S/ 0.00.");
                     }
+                    if ($equipoModel->existeCodigo($codigo, $id ?: null)) {
+                        throw new Exception("El código «{$codigo}» ya pertenece a otro equipo en el inventario.");
+                    }
+
+                    $_POST['codigo'] = $codigo;
+                    $_POST['nombre'] = $nombre;
 
                     if ($id) {
                         $equipoModel->actualizar($id, $_POST);
-                        $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'texto' => 'Equipo actualizado correctamente.'];
+                        $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => '¡Actualizado!', 'texto' => 'Los datos del equipo fueron actualizados.'];
                     } else {
                         $equipoModel->guardar($_POST);
-                        $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'texto' => 'Equipo registrado correctamente.'];
+                        $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => '¡Registrado!', 'texto' => 'Equipo agregado al inventario correctamente.'];
                     }
                 }
             } catch (PDOException $e) {
                 $msg = ($e->getCode() == 23000)
-                    ? "Error: El código de equipo ya existe en el inventario."
+                    ? "El código de equipo ingresado ya existe en el inventario."
                     : "Error en base de datos: " . $e->getMessage();
-                $_SESSION['alerta_equipo'] = ['tipo' => 'danger', 'texto' => $msg];
+                $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'No se pudo guardar', 'texto' => $msg];
             } catch (Exception $e) {
-                $_SESSION['alerta_equipo'] = ['tipo' => 'danger', 'texto' => $e->getMessage()];
+                $_SESSION['alerta_equipo'] = ['tipo' => 'warning', 'titulo' => 'Atención', 'texto' => $e->getMessage()];
             }
 
             header("Location: index.php?action=equipos");
@@ -60,22 +70,45 @@ class EquipoController {
         }
 
         if (isset($_GET['eliminar'])) {
+            if ($rolUsuario !== 'Administrador') {
+                $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'Acceso denegado', 'texto' => 'Solo un Administrador puede eliminar equipos.'];
+                header("Location: index.php?action=equipos");
+                exit();
+            }
+
             try {
                 $equipoModel->eliminar($_GET['eliminar']);
-                $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'texto' => 'Equipo eliminado correctamente.'];
+                $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => 'Eliminado', 'texto' => 'Equipo eliminado del inventario.'];
             } catch (PDOException $e) {
-                $_SESSION['alerta_equipo'] = ['tipo' => 'danger', 'texto' => 'No se puede eliminar este equipo porque tiene contratos registrados.'];
+                $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'No se puede eliminar', 'texto' => 'Este equipo tiene historial de contratos de alquiler asociados.'];
             }
             header("Location: index.php?action=equipos");
             exit();
         }
 
         if (isset($_GET['eliminar_cat'])) {
-            try {
-                $categoriaModel->eliminar($_GET['eliminar_cat']);
-                $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'texto' => 'Categoría eliminada correctamente.'];
-            } catch (PDOException $e) {
-                $_SESSION['alerta_equipo'] = ['tipo' => 'danger', 'texto' => 'No se puede eliminar la categoría porque tiene equipos asociados.'];
+            if ($rolUsuario !== 'Administrador') {
+                $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'Acceso denegado', 'texto' => 'Solo un Administrador puede eliminar categorías.'];
+                header("Location: index.php?action=equipos");
+                exit();
+            }
+
+            $idCat = $_GET['eliminar_cat'];
+            $asociados = $categoriaModel->contarEquiposAsociados($idCat);
+
+            if ($asociados > 0) {
+                $_SESSION['alerta_equipo'] = [
+                    'tipo'   => 'warning',
+                    'titulo' => 'Categoría en uso',
+                    'texto'  => "No se puede eliminar porque tiene {$asociados} equipo(s) asociado(s)."
+                ];
+            } else {
+                try {
+                    $categoriaModel->eliminar($idCat);
+                    $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => 'Eliminada', 'texto' => 'Categoría eliminada correctamente.'];
+                } catch (PDOException $e) {
+                    $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'Error', 'texto' => 'No se pudo eliminar la categoría.'];
+                }
             }
             header("Location: index.php?action=equipos");
             exit();
