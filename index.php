@@ -11,6 +11,11 @@ switch ($action) {
         (new AuthController())->login();
         break;
 
+    case 'register':
+        require_once 'controllers/AuthController.php';
+        (new AuthController())->register();
+        break;
+
     case 'logout':
         require_once 'controllers/AuthController.php';
         (new AuthController())->logout();
