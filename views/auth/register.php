@@ -3,260 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Personal — Empresa M | Alquiler de Maquinaria</title>
+    <title>Registro de Personal — Empresa M | Alquiler</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --bg-panel: rgba(17, 24, 39, 0.88);
-            --accent-amber: #f59e0b;
-            --border-subtle: rgba(255, 255, 255, 0.1);
+            --nav-dark: #0b1120;
+            --brand-blue: #2563eb;
+            --brand-blue-hover: #1d4ed8;
+            --brand-cyan: #38bdf8;
+            --surface-bg: #f1f5f9;
         }
 
         body {
             min-height: 100vh;
             margin: 0;
-            background-color: var(--bg-dark);
-            background-image:
-                radial-gradient(circle at 15% 20%, rgba(245, 158, 11, 0.14) 0%, transparent 42%),
-                radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.18) 0%, transparent 45%),
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+            background-color: var(--surface-bg);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            color: #f8fafc;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow-x: hidden;
-            padding: 2rem 1rem;
+            align-items: stretch;
         }
 
-        .hazard-top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: repeating-linear-gradient(
-                -45deg,
-                #f59e0b,
-                #f59e0b 14px,
-                #111827 14px,
-                #111827 28px
-            );
-            z-index: 100;
-        }
-
-        .bg-gear-watermark {
-            position: fixed;
-            right: -90px;
-            bottom: -90px;
-            width: 420px;
-            height: 420px;
-            opacity: 0.045;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .auth-wrapper {
+        .split-container {
+            display: flex;
             width: 100%;
-            max-width: 480px;
+            min-height: 100vh;
+        }
+
+        .brand-side {
+            flex: 1.05;
+            background: linear-gradient(145deg, #070b14 0%, #0b1120 55%, #132240 100%);
+            color: #ffffff;
+            padding: 3rem 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-side::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            background-size: 38px 38px;
+            pointer-events: none;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.35rem;
+            font-weight: 700;
             position: relative;
             z-index: 2;
         }
 
-        .auth-card {
-            background: var(--bg-panel);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--border-subtle);
-            border-top: 3px solid var(--accent-amber);
-            border-radius: 16px;
-            padding: 2rem 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        .brand-logo i {
+            color: var(--brand-cyan);
+            font-size: 1.55rem;
         }
 
-        .brand-badge {
+        .brand-logo .divider {
+            color: rgba(255, 255, 255, 0.25);
+            font-weight: 300;
+        }
+
+        .brand-logo .highlight {
+            color: var(--brand-cyan);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+        }
+
+        .hero-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(245, 158, 11, 0.12);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #fbbf24;
-            padding: 5px 14px;
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #7dd3fc;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 6px 14px;
             border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
         }
 
-        .brand-title {
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.22;
+            margin-bottom: 1rem;
+        }
+
+        .hero-desc {
+            color: #94a3b8;
+            font-size: 0.96rem;
+            line-height: 1.6;
+        }
+
+        .machinery-bg-svg {
+            position: absolute;
+            right: -20px;
+            bottom: 20px;
+            width: 420px;
+            opacity: 0.11;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .brand-footer {
+            position: relative;
+            z-index: 2;
+            color: #64748b;
+            font-size: 0.82rem;
+        }
+
+        .form-side {
+            flex: 1.05;
+            background-color: var(--surface-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 470px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--brand-blue);
+            border-radius: 14px;
+            padding: 2rem 2rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        .register-title {
             font-size: 1.45rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #0f172a;
         }
 
-        .brand-subtitle {
-            color: #94a3b8;
+        .register-subtitle {
+            color: #64748b;
             font-size: 0.88rem;
         }
 
         .form-label {
-            color: #cbd5e1;
             font-size: 0.83rem;
             font-weight: 600;
+            color: #334155;
             margin-bottom: 0.35rem;
         }
 
         .input-group-text {
-            background-color: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(148, 163, 184, 0.22);
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-right: none;
-            color: #94a3b8;
-        }
-
-        .form-control, .form-select {
-            background-color: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            color: #f8fafc;
-            padding: 0.6rem 0.85rem;
-            font-size: 0.92rem;
-        }
-
-        .form-control::placeholder {
             color: #64748b;
         }
 
-        .form-control:focus, .form-select:focus {
-            background-color: rgba(15, 23, 42, 1);
-            border-color: var(--accent-amber);
-            color: #ffffff;
-            box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.18);
+        .form-control, .form-select {
+            border: 1px solid #cbd5e1;
+            padding: 0.6rem 0.85rem;
+            font-size: 0.92rem;
+            color: #0f172a;
         }
 
-        .form-select option {
-            background-color: #0f172a;
-            color: #f8fafc;
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
         }
 
         .input-group:focus-within .input-group-text {
-            border-color: var(--accent-amber);
-            color: #fbbf24;
+            border-color: var(--brand-blue);
+            color: var(--brand-blue);
         }
 
-        .btn-industrial {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        .btn-primary-brand {
+            background-color: var(--brand-blue);
             border: none;
-            color: #0f172a;
-            font-weight: 700;
+            color: #ffffff;
+            font-weight: 600;
             padding: 0.7rem 1rem;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 0.95rem;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: background-color 0.15s ease, transform 0.15s ease;
         }
 
-        .btn-industrial:hover {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: #090d16;
+        .btn-primary-brand:hover {
+            background-color: var(--brand-blue-hover);
+            color: #ffffff;
             transform: translateY(-1px);
-            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.4);
         }
 
-        .auth-footer-link {
-            color: #fbbf24;
+        .link-brand {
+            color: var(--brand-blue);
             text-decoration: none;
             font-weight: 600;
         }
 
-        .auth-footer-link:hover {
-            color: #fde68a;
+        .link-brand:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: 900px) {
+            .brand-side {
+                display: none;
+            }
+            .form-side {
+                background: linear-gradient(145deg, #0b1120 0%, #132240 100%);
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="hazard-top-bar"></div>
-
-<svg class="bg-gear-watermark" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
-    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
-</svg>
-
-<div class="auth-wrapper">
-    <div class="auth-card">
-        <div class="text-center mb-3">
-            <div class="brand-badge">
-                <i class="bi bi-gear-wide-connected"></i>
-                <span>Empresa M • Alquiler</span>
-            </div>
-            <h1 class="brand-title mb-1">Crear Cuenta</h1>
-            <p class="brand-subtitle mb-0">Registro de personal operativo y administrativo</p>
+<div class="split-container">
+    <div class="brand-side">
+        <div class="brand-logo">
+            <i class="bi bi-gear-wide-connected"></i>
+            <span>Empresa M</span>
+            <span class="divider">|</span>
+            <span class="highlight">Alquiler</span>
         </div>
 
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger d-flex align-items-center py-2 px-3 small border-0" style="background: rgba(220, 38, 38, 0.22); color: #fca5a5;">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <div><?= htmlspecialchars($error) ?></div>
+        <div class="hero-content">
+            <div class="hero-pill">
+                <i class="bi bi-person-badge"></i>
+                <span>CONTROL DE ACCESO POR ROLES</span>
             </div>
-        <?php endif; ?>
+            <h1 class="hero-title">Alta de personal operativo y administrativo</h1>
+            <p class="hero-desc">
+                Crea una cuenta asignando el perfil correspondiente (Encargado o Administrador) para gestionar equipos, clientes y contratos según los permisos de tu área.
+            </p>
+        </div>
 
-        <form method="POST" action="index.php?action=register">
-            <div class="row g-2 mb-3">
-                <div class="col-6">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" name="nombre" class="form-control" required value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" placeholder="Ej. Juan">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Apellido</label>
-                    <input type="text" name="apellido" class="form-control" required value="<?= htmlspecialchars($_POST['apellido'] ?? '') ?>" placeholder="Ej. Pérez">
-                </div>
-            </div>
+        <svg class="machinery-bg-svg" viewBox="0 0 640 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="110" y="275" width="270" height="52" rx="26" stroke="#38bdf8" stroke-width="8"/>
+            <circle cx="145" cy="301" r="14" stroke="#38bdf8" stroke-width="6"/>
+            <circle cx="205" cy="301" r="14" stroke="#38bdf8" stroke-width="6"/>
+            <circle cx="285" cy="301" r="14" stroke="#38bdf8" stroke-width="6"/>
+            <circle cx="345" cy="301" r="14" stroke="#38bdf8" stroke-width="6"/>
+            <path d="M135 275V205H225V135H315L345 205H365V275H135Z" stroke="#38bdf8" stroke-width="8" stroke-linejoin="round"/>
+            <rect x="242" y="152" width="60" height="45" rx="6" stroke="#38bdf8" stroke-width="5"/>
+            <path d="M345 190L465 75L555 155" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M360 215L460 115" stroke="#38bdf8" stroke-width="6" stroke-linecap="round"/>
+            <path d="M545 155L595 175L580 225L530 205Z" stroke="#38bdf8" stroke-width="8" stroke-linejoin="round"/>
+        </svg>
 
+        <div class="brand-footer">
+            © 2026 Empresa M — Sistema de Alquiler y Control de Maquinaria
+        </div>
+    </div>
+
+    <div class="form-side">
+        <div class="register-card">
             <div class="mb-3">
-                <label class="form-label">Correo electrónico</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                    <input type="email" name="correo" class="form-control" required value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>" placeholder="usuario@empresam.com">
-                </div>
+                <h2 class="register-title mb-1">Crear Cuenta</h2>
+                <p class="register-subtitle mb-0">Registro de personal en Empresa M</p>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Rol del sistema</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                    <select name="rol" class="form-select" required>
-                        <option value="Encargado" <?= (($_POST['rol'] ?? '') === 'Encargado') ? 'selected' : '' ?>>Encargado de Operaciones</option>
-                        <option value="Administrador" <?= (($_POST['rol'] ?? '') === 'Administrador') ? 'selected' : '' ?>>Administrador General</option>
-                    </select>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger d-flex align-items-center py-2 px-3 small">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div><?= htmlspecialchars($error) ?></div>
                 </div>
+            <?php endif; ?>
+
+            <form method="POST" action="index.php?action=register">
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" required value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" placeholder="Ej. Juan">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" name="apellido" class="form-control" required value="<?= htmlspecialchars($_POST['apellido'] ?? '') ?>" placeholder="Ej. Pérez">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Correo electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" name="correo" class="form-control" required value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>" placeholder="usuario@empresam.com">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Rol del sistema</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                        <select name="rol" class="form-select" required>
+                            <option value="Encargado" <?= (($_POST['rol'] ?? '') === 'Encargado') ? 'selected' : '' ?>>Encargado</option>
+                            <option value="Administrador" <?= (($_POST['rol'] ?? '') === 'Administrador') ? 'selected' : '' ?>>Administrador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="contrasena" class="form-control" required minlength="6" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Confirmar contraseña</label>
+                        <input type="password" name="confirmar_contrasena" class="form-control" required minlength="6" placeholder="Repita su clave">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary-brand w-100">
+                    <i class="bi bi-person-plus-fill me-1"></i> Registrarme
+                </button>
+            </form>
+
+            <div class="text-center mt-3 pt-3 border-top">
+                <small class="text-muted">
+                    ¿Ya tienes cuenta?
+                    <a href="index.php?action=login" class="link-brand ms-1">Inicia sesión</a>
+                </small>
             </div>
-
-            <div class="row g-2 mb-4">
-                <div class="col-6">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" name="contrasena" class="form-control" required minlength="6" placeholder="Mín. 6 caracteres">
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Confirmar</label>
-                    <input type="password" name="confirmar_contrasena" class="form-control" required minlength="6" placeholder="Repita clave">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-industrial w-100">
-                <i class="bi bi-person-plus-fill me-1"></i> Registrarme en el Sistema
-            </button>
-        </form>
-
-        <div class="text-center mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.08);">
-            <small style="color: #94a3b8;">
-                ¿Ya tienes cuenta?
-                <a href="index.php?action=login" class="auth-footer-link ms-1">Inicia sesión</a>
-            </small>
         </div>
     </div>
 </div>
