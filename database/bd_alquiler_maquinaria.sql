@@ -40,6 +40,19 @@ CREATE TABLE equipo (
     FOREIGN KEY (id_categoria) REFERENCES categoria_equipo(id_categoria)
 );
 
+CREATE TABLE mantenimiento_equipo (
+    id_mantenimiento INT AUTO_INCREMENT PRIMARY KEY,
+    id_equipo INT NOT NULL,
+    fecha_ingreso DATE NOT NULL,
+    fecha_salida DATE NULL,
+    tipo_mantenimiento VARCHAR(80) NOT NULL,
+    descripcion TEXT NOT NULL,
+    costo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    estado_mantenimiento ENUM('En Taller', 'Finalizado') NOT NULL DEFAULT 'En Taller',
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_equipo) REFERENCES equipo(id_equipo) ON DELETE CASCADE
+);
+
 CREATE TABLE contrato_alquiler (
     id_contrato INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -87,4 +100,4 @@ CREATE TABLE notificacion (
 
 INSERT INTO usuario (nombre, apellido, correo, contrasena, rol, estado) VALUES
 ('Darwin', 'Admin', 'admin@empresam.com', '123456', 'Administrador', 1),
-('Carlos', 'Encargado', 'encargado@empresam.com', '123456', 'Encargado', 1);
+('Carlos', 'Encargado', 'encargado@empresam.com', '123456', 'Encargado', 1);bd_alquiler_maquinariabd_alquiler_maquinaria
