@@ -16,6 +16,10 @@ class EquipoController {
             $subaccion = $_POST['subaccion'] ?? '';
             try {
                 if ($subaccion === 'guardar_categoria') {
+                    // Homologación de seguridad: solo Administrador crea categorías
+                    if ($rolUsuario !== 'Administrador') {
+                        throw new Exception("Solo un Administrador puede registrar nuevas categorías.");
+                    }
                     $nombreCat = trim($_POST['nombre_cat'] ?? '');
                     if ($nombreCat === '') {
                         throw new Exception("El nombre de la categoría es obligatorio.");
@@ -25,6 +29,7 @@ class EquipoController {
                     }
                     $categoriaModel->guardar($nombreCat, trim($_POST['desc_cat'] ?? ''));
                     $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => '¡Registrado!', 'texto' => 'Categoría agregada correctamente.'];
+
                 } elseif ($subaccion === 'guardar_equipo') {
                     $id = $_POST['id_equipo'] ?? '';
                     $idCategoria = $_POST['id_categoria'] ?? '';
@@ -55,6 +60,41 @@ class EquipoController {
                         $equipoModel->guardar($_POST);
                         $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => '¡Registrado!', 'texto' => 'Equipo agregado al inventario correctamente.'];
                     }
+
+                } elseif ($subaccion === 'guardar_mantenimiento') {
+                    $idEquipo = $_POST['id_equipo_mant'] ?? '';
+                    $fechaIngreso = $_POST['fecha_ingreso'] ?? '';
+                    $fechaSalida = $_POST['fecha_salida'] ?? '';
+                    $tipoMant = trim($_POST['tipo_mantenimiento'] ?? '');
+                    $descMant = trim($_POST['descripcion_mant'] ?? '');
+                    $costoMant = floatval($_POST['costo_mant'] ?? 0);
+                    $estadoMant = $_POST['estado_mantenimiento'] ?? 'En Taller';
+
+                    if ($idEquipo === '' || $fechaIngreso === '' || $tipoMant === '' || $descMant === '') {
+                        throw new Exception("Complete todos los campos obligatorios del mantenimiento.");
+                    }
+                    if ($costoMant < 0) {
+                        throw new Exception("El costo de mantenimiento no puede ser negativo.");
+                    }
+                    if ($fechaSalida !== '' && $fechaSalida < $fechaIngreso) {
+                        throw new Exception("La fecha de salida no puede ser anterior a la fecha de ingreso.");
+                    }
+
+                    $equipoModel->registrarMantenimiento([
+                        'id_equipo' => $idEquipo,
+                        'fecha_ingreso' => $fechaIngreso,
+                        'fecha_salida' => $fechaSalida,
+                        'tipo_mantenimiento' => $tipoMant,
+                        'descripcion' => $descMant,
+                        'costo' => $costoMant,
+                        'estado_mantenimiento' => $estadoMant
+                    ]);
+
+                    $_SESSION['alerta_equipo'] = [
+                        'tipo' => 'success',
+                        'titulo' => 'Mantenimiento registrado',
+                        'texto' => 'El historial técnico y el estado del equipo fueron actualizados.'
+                    ];
                 }
             } catch (PDOException $e) {
                 $msg = ($e->getCode() == 23000)
@@ -65,6 +105,29 @@ class EquipoController {
                 $_SESSION['alerta_equipo'] = ['tipo' => 'warning', 'titulo' => 'Atención', 'texto' => $e->getMessage()];
             }
 
+            header("Location: index.php?action=equipos");
+            exit();
+        }
+
+        if (isset($_GET['finalizar_mant'])) {
+            $equipoModel->finalizarMantenimiento($_GET['finalizar_mant']);
+            $_SESSION['alerta_equipo'] = [
+                'tipo' => 'success',
+                'titulo' => 'Salida de taller',
+                'texto' => 'Mantenimiento finalizado y equipo marcado como Disponible.'
+            ];
+            header("Location: index.php?action=equipos");
+            exit();
+        }
+
+        if (isset($_GET['eliminar_mant'])) {
+            if ($rolUsuario !== 'Administrador') {
+                $_SESSION['alerta_equipo'] = ['tipo' => 'error', 'titulo' => 'Acceso denegado', 'texto' => 'Solo un Administrador puede eliminar registros de mantenimiento.'];
+                header("Location: index.php?action=equipos");
+                exit();
+            }
+            $equipoModel->eliminarMantenimiento($_GET['eliminar_mant']);
+            $_SESSION['alerta_equipo'] = ['tipo' => 'success', 'titulo' => 'Eliminado', 'texto' => 'Registro de mantenimiento eliminado.'];
             header("Location: index.php?action=equipos");
             exit();
         }
@@ -120,6 +183,7 @@ class EquipoController {
         $equipoEditar = isset($_GET['editar']) ? $equipoModel->obtenerPorId($_GET['editar']) : null;
         $equipos = $equipoModel->listar();
         $categorias = $categoriaModel->listar();
+        $mantenimientos = $equipoModel->listarMantenimientos();
 
         require __DIR__ . '/../views/layout/header.php';
         require __DIR__ . '/../views/equipos/index.php';
