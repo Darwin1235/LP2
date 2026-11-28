@@ -60,7 +60,7 @@ class AuthController {
             $correo     = trim($_POST['correo'] ?? '');
             $contrasena = trim($_POST['contrasena'] ?? '');
             $confirmar  = trim($_POST['confirmar_contrasena'] ?? '');
-            $rol        = trim($_POST['rol'] ?? 'Encargado');
+            $rol        = 'Encargado'; // Todo nuevo registro se asigna exclusivamente como Encargado
 
             if ($nombre === '' || $apellido === '' || $correo === '' || $contrasena === '') {
                 $error = "Todos los campos son obligatorios.";
