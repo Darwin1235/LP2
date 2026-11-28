@@ -172,14 +172,14 @@
             color: #64748b;
         }
 
-        .form-control, .form-select {
+        .form-control {
             border: 1px solid #cbd5e1;
             padding: 0.6rem 0.85rem;
             font-size: 0.92rem;
             color: #0f172a;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus {
             border-color: var(--brand-blue);
             box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
         }
@@ -240,11 +240,11 @@
         <div class="hero-content">
             <div class="hero-pill">
                 <i class="bi bi-person-badge"></i>
-                <span>CONTROL DE ACCESO POR ROLES</span>
+                <span>ACCESO OPERATIVO — ENCARGADOS</span>
             </div>
-            <h1 class="hero-title">Alta de personal operativo y administrativo</h1>
+            <h1 class="hero-title">Registro de personal operativo</h1>
             <p class="hero-desc">
-                Crea una cuenta asignando el perfil correspondiente (Encargado o Administrador) para gestionar equipos, clientes y contratos según los permisos de tu área.
+                Crea tu cuenta de Encargado para gestionar el inventario de maquinaria, registrar mantenimientos en taller, atender clientes y administrar contratos de alquiler.
             </p>
         </div>
 
@@ -270,7 +270,7 @@
         <div class="register-card">
             <div class="mb-3">
                 <h2 class="register-title mb-1">Crear Cuenta</h2>
-                <p class="register-subtitle mb-0">Registro de personal en Empresa M</p>
+                <p class="register-subtitle mb-0">Alta de Encargado en Empresa M</p>
             </div>
 
             <?php if (!empty($error)): ?>
@@ -297,17 +297,6 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input type="email" name="correo" class="form-control" required value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>" placeholder="usuario@empresam.com">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Rol del sistema</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                        <select name="rol" class="form-select" required>
-                            <option value="Encargado" <?= (($_POST['rol'] ?? '') === 'Encargado') ? 'selected' : '' ?>>Encargado</option>
-                            <option value="Administrador" <?= (($_POST['rol'] ?? '') === 'Administrador') ? 'selected' : '' ?>>Administrador</option>
-                        </select>
                     </div>
                 </div>
 
